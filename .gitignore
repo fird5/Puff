@@ -1,0 +1,23 @@
+node_modules/
+.vercel/
+dist/
+.output/
+.nitro/
+artifacts/
+screenshots/
+*.log
+.DS_Store
+
+# local preview / sandbox
+.grok/preview.log
+.grok/preview.pid
+.grok/skills/
+.grok/references/
+.grok/status
+.grok/favicon-*.png
+.grok/favicon-preview.html
+.project_id
+.node_modules.lock
+public/__grok/
+AGENTS.md
+AGENTS.project.md
