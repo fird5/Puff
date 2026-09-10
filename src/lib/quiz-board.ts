@@ -10,8 +10,39 @@ export type BoardRow = {
   rounds: number;
 };
 
-export const listQuizBoard = createServerFn({ method: "GET" }).handler(async (): Promise<BoardRow[]> => {
+async function ensureBoard() {
   const sql = await getSql();
+  await sql.query(`
+    create table if not exists quiz_scores (
+      name_key text primary key,
+      display_name text not null,
+      best_correct integer not null,
+      best_total integer not null,
+      rounds integer not null default 1,
+      updated_at timestamptz not null default now()
+    )
+  `);
+  return sql;
+}
+
+function toRow(row: {
+  name_key: string;
+  display_name: string;
+  best_correct: number;
+  best_total: number;
+  rounds: number;
+}): BoardRow {
+  return {
+    nameKey: row.name_key,
+    displayName: row.display_name,
+    bestCorrect: row.best_correct,
+    bestTotal: row.best_total,
+    rounds: row.rounds,
+  };
+}
+
+export const listQuizBoard = createServerFn({ method: "GET" }).handler(async (): Promise<BoardRow[]> => {
+  const sql = await ensureBoard();
   const rows = await sql<{
     name_key: string;
     display_name: string;
@@ -24,13 +55,7 @@ export const listQuizBoard = createServerFn({ method: "GET" }).handler(async ():
     order by (best_correct::float / nullif(best_total, 0)) desc, rounds desc, updated_at asc
     limit 20
   `;
-  return rows.map((row) => ({
-    nameKey: row.name_key,
-    displayName: row.display_name,
-    bestCorrect: row.best_correct,
-    bestTotal: row.best_total,
-    rounds: row.rounds,
-  }));
+  return rows.map(toRow);
 });
 
 export const submitQuizRound = createServerFn({ method: "POST" })
@@ -42,7 +67,7 @@ export const submitQuizRound = createServerFn({ method: "POST" })
     return { correct, total, displayName: cleanName(input.displayName) };
   })
   .handler(async ({ data }): Promise<BoardRow> => {
-    const sql = await getSql();
+    const sql = await ensureBoard();
     const key = nameKey(data.displayName);
     const existing = await sql<{
       best_correct: number;
