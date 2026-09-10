@@ -5,15 +5,29 @@ import { dirname, join } from "node:path";
 import pg from "pg";
 import { pendingMigrations } from "./migration-plan.mjs";
 
-const databaseUrl =
-  process.env.DATABASE_URL ||
-  process.env.POSTGRES_URL ||
-  process.env.POSTGRES_PRISMA_URL ||
-  process.env.POSTGRES_URL_NON_POOLING;
+const keys = [
+  "DATABASE_URL",
+  "POSTGRES_URL",
+  "POSTGRES_PRISMA_URL",
+  "POSTGRES_URL_NON_POOLING",
+  "DATABASE_URL_DATABASE_URL",
+  "DATABASE_URL_POSTGRES_URL",
+  "DATABASE_URL_POSTGRES_PRISMA_URL",
+  "DATABASE_URL_POSTGRES_URL_NON_POOLING",
+];
+
+let databaseUrl;
+for (const key of keys) {
+  const value = process.env[key];
+  if (value && value.trim() && /^(postgres|postgresql):\/\//i.test(value.trim())) {
+    databaseUrl = value.trim();
+    break;
+  }
+}
 
 if (!databaseUrl) {
   console.log(
-    "[migrate] No DATABASE_URL / POSTGRES_URL — skipping (PGLite will migrate locally).",
+    "[migrate] No postgres:// URL in DATABASE_URL / POSTGRES_URL / DATABASE_URL_POSTGRES_URL — skipping.",
   );
   process.exit(0);
 }
@@ -54,7 +68,7 @@ async function main() {
         try {
           await client.query("ROLLBACK");
         } catch {
-          // keep original error
+          // keep original
         }
         throw err;
       }
@@ -70,8 +84,5 @@ async function main() {
 
 main().catch((err) => {
   console.error("[migrate] failed:", err?.message || err);
-  for (const key of ["code", "detail", "hint", "position", "where"]) {
-    if (err?.[key] != null) console.error(`[migrate]   ${key}: ${err[key]}`);
-  }
   process.exit(1);
 });

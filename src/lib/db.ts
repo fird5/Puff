@@ -1,29 +1,12 @@
 import { pendingMigrations } from "../../scripts/migration-plan.mjs";
+import { resolveDatabaseUrl } from "./env-database-url";
 
 /** Which database backend is active. */
 export type DbSource = "neon" | "pglite";
 
-function firstEnv(...keys: string[]): string | undefined {
-  if (typeof process === "undefined") return undefined;
-  for (const key of keys) {
-    const value = process.env[key];
-    if (value && value.trim()) return value.trim();
-  }
-  return undefined;
-}
+const databaseUrl =
+  typeof process === "undefined" ? undefined : resolveDatabaseUrl(process.env);
 
-// Vercel + Neon Storage often injects POSTGRES_URL, not DATABASE_URL.
-const databaseUrl = firstEnv(
-  "DATABASE_URL",
-  "POSTGRES_URL",
-  "POSTGRES_PRISMA_URL",
-  "POSTGRES_URL_NON_POOLING",
-);
-
-/**
- * Active backend: real **Postgres** when a connection string is set,
- * otherwise embedded **PGLite** for local preview only.
- */
 export const dbSource: DbSource = databaseUrl ? "neon" : "pglite";
 
 export interface Sql {
@@ -85,7 +68,7 @@ function createNeonSql(): Promise<Sql> {
 async function createPgliteSql(): Promise<Sql> {
   if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
     throw new Error(
-      "Postgres URL missing on Vercel. Set DATABASE_URL or POSTGRES_URL on Production and redeploy.",
+      "Postgres URL missing on Vercel. Add a variable named exactly DATABASE_URL (postgres://...) on Production and redeploy.",
     );
   }
 
