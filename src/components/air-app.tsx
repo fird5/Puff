@@ -211,36 +211,8 @@ export function AirApp({ initial }: Props) {
           </div>
         </header>
 
-        <section className="grid items-center gap-2 sm:grid-cols-[1fr_1.1fr]">
-          <PuffCharacter band={band} stage={stage} popping={popping} className="mx-auto h-56 w-56 sm:h-64 sm:w-64" />
-          <div className="text-center sm:text-left">
-            <p className="font-display text-2xl leading-tight text-fg sm:text-3xl">{copy.headline}</p>
-            <p className="mt-2 text-base leading-relaxed text-fg-muted">{copy.quip}</p>
-            <p className="mt-3 text-sm text-fg-subtle">
-              {STAGE_LABEL[stage]} · {quizSave.rounds} trivia round{quizSave.rounds === 1 ? "" : "s"}
-            </p>
-            <p className="mt-1 text-xs leading-relaxed text-fg-subtle">
-              Tip: Puff grows on trivia. Answer well and he puffs up. Ghost the quiz and he deflates like a sad birthday balloon in a void deck.
-            </p>
-            <div className="mt-5 rounded-2xl border border-border bg-bg-elevated p-4 text-left">
-              <p className="font-display text-xl leading-snug tracking-tight text-fg sm:text-2xl">
-                While you're here checking the haze,
-                <br />
-                try a trivia and earn some praise.
-              </p>
-              <p className="mt-1.5 text-sm leading-relaxed text-fg-muted">
-                New trivia drops while you check haze levels. Play to get on the board or hold your lead.
-              </p>
-              <button type="button" onClick={() => setQuizOpen(true)} className="mt-3 inline-flex h-11 items-center gap-2 rounded-xl bg-accent px-4 text-sm font-medium text-accent-fg transition-transform duration-150 ease-out active:scale-[0.96]">
-                <Trophy className="size-4" />
-                I'm in
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <div className="grid items-stretch gap-3 lg:grid-cols-[1.15fr_0.85fr]">
-          <section className="rounded-2xl border border-border bg-bg-elevated p-5 sm:p-6">
+        <div className="flex flex-col gap-3 lg:grid lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
+          <section className="order-1 rounded-2xl border border-border bg-bg-elevated p-5 sm:p-6 lg:order-2 lg:row-start-2 lg:row-span-2">
             {error ? <p className="text-sm text-unhealthy">{error} Try refresh.</p> : null}
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
@@ -274,7 +246,8 @@ export function AirApp({ initial }: Props) {
               <Stat label="NO₂ 1h max" value={reading?.no2} unit="µg/m³" />
             </dl>
           </section>
-          <div className="flex flex-col gap-3">
+
+          <div className="order-2 lg:order-3 lg:col-start-2 lg:row-start-2">
             <div className="rounded-2xl border border-border bg-bg-elevated px-3 py-2.5">
               <div className="flex items-center justify-between gap-2">
                 <p className="text-[11px] font-medium uppercase tracking-wide text-fg-subtle">Region</p>
@@ -298,6 +271,37 @@ export function AirApp({ initial }: Props) {
               {loc.status === "denied" ? <p className="mt-1.5 text-[11px] text-fg-muted">Location blocked. Tap a region.</p> : null}
               {loc.status === "away" ? <p className="mt-1.5 text-[11px] text-fg-muted">Outside SG — pick a region.</p> : null}
             </div>
+          </div>
+
+          <section className="order-3 grid items-center gap-2 sm:grid-cols-[1fr_1.1fr] lg:order-1 lg:col-span-2 lg:row-start-1">
+            <PuffCharacter band={band} stage={stage} popping={popping} className="mx-auto h-36 w-36 sm:h-56 sm:w-56 lg:h-64 lg:w-64" />
+            <div className="text-center sm:text-left">
+              <p className="font-display text-2xl leading-tight text-fg sm:text-3xl">{copy.headline}</p>
+              <p className="mt-2 text-base leading-relaxed text-fg-muted">{copy.quip}</p>
+              <p className="mt-3 text-sm text-fg-subtle">
+                {STAGE_LABEL[stage]} · {quizSave.rounds} trivia round{quizSave.rounds === 1 ? "" : "s"}
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-fg-subtle">
+                Tip: Puff grows on trivia. Answer well and he puffs up. Ghost the quiz and he deflates like a sad birthday balloon in a void deck.
+              </p>
+              <div className="mt-5 rounded-2xl border border-border bg-bg-elevated p-4 text-left">
+                <p className="font-display text-xl leading-snug tracking-tight text-fg sm:text-2xl">
+                  While you're here checking the haze,
+                  <br />
+                  try a trivia and earn some praise.
+                </p>
+                <p className="mt-1.5 text-sm leading-relaxed text-fg-muted">
+                  New trivia drops while you check haze levels. Play to get on the board or hold your lead.
+                </p>
+                <button type="button" onClick={() => setQuizOpen(true)} className="mt-3 inline-flex h-11 items-center gap-2 rounded-xl bg-accent px-4 text-sm font-medium text-accent-fg transition-transform duration-150 ease-out active:scale-[0.96]">
+                  <Trophy className="size-4" />
+                  I'm in
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <div className="order-4 lg:col-start-2 lg:row-start-3">
             <HomeBoard myName={quizSave.name} refreshKey={boardTick} onPlay={() => setQuizOpen(true)} />
           </div>
         </div>
