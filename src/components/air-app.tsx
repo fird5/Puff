@@ -215,21 +215,28 @@ export function AirApp({ initial }: Props) {
         <div className="flex flex-col gap-3 lg:grid lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
           <section className="order-1 rounded-2xl border border-border bg-bg-elevated p-4 sm:p-6 lg:order-2 lg:row-start-2 lg:row-span-2">
             {error ? <p className="text-sm text-unhealthy">{error} Try refresh.</p> : null}
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <div>
+            <div className="flex items-end justify-between gap-3">
+              <div className="min-w-0">
                 <p className="text-xs font-medium tracking-wide text-fg-subtle uppercase">24-hour PSI · {REGION_LABEL[region]}</p>
-                <div className="mt-1 flex items-baseline gap-3">
+                <div className="mt-1 flex items-baseline gap-2 sm:gap-3">
                   <span className="font-display text-5xl leading-none tabular-nums tracking-tight text-fg sm:text-7xl">{loading && !data ? "—" : psi}</span>
                   <span className={cn("rounded-full px-3 py-1 text-sm font-medium", band === "good" && "bg-good/12 text-good", band === "moderate" && "bg-moderate/12 text-moderate", band === "unhealthy" && "bg-unhealthy/12 text-unhealthy", band === "very-unhealthy" && "bg-very-unhealthy/12 text-very-unhealthy", band === "hazardous" && "bg-hazardous/12 text-hazardous")}>{copy.label}</span>
                 </div>
+                <p className="mt-1 text-xs text-fg-muted sm:hidden">
+                  1-hr PM2.5 <span className="font-medium text-fg tabular-nums">{reading?.pm25Hourly ?? "—"}</span> µg/m³
+                  {data ? <span className="text-fg-subtle"> · {formatSgt(data.updatedAt)}</span> : null}
+                </p>
               </div>
-              <div className="text-sm text-fg-muted">
+              <button type="button" onClick={() => document.getElementById("puff-more")?.scrollIntoView({ behavior: "smooth", block: "start" })} className="lg:hidden" aria-label="See Puff and trivia">
+                <PuffCharacter band={band} stage={stage} popping={popping} className="h-20 w-20" />
+              </button>
+              <div className="hidden text-sm text-fg-muted sm:block">
                 <p>1-hr PM2.5 <span className="font-medium text-fg tabular-nums">{reading?.pm25Hourly ?? "—"}</span> µg/m³</p>
                 {data ? <p className="mt-1 text-fg-subtle">Updated {formatSgt(data.updatedAt)}</p> : null}
               </div>
             </div>
-            <p className="mt-4 max-w-prose text-sm leading-relaxed text-fg-muted">{copy.advice}</p>
-            <div className="mt-5">
+            <p className="mt-4 hidden max-w-prose text-sm leading-relaxed text-fg-muted sm:block">{copy.advice}</p>
+            <div className="mt-3 sm:mt-5">
               <div className="relative h-2 overflow-hidden rounded-full bg-bg-subtle">
                 <div className="absolute inset-y-0 left-0 w-1/5 bg-good/70" />
                 <div className="absolute inset-y-0 left-1/5 w-1/5 bg-moderate/70" />
@@ -240,7 +247,7 @@ export function AirApp({ initial }: Props) {
               </div>
               <div className="mt-1.5 flex justify-between text-xs text-fg-subtle"><span>0</span><span>50</span><span>100</span><span>200</span><span>300+</span></div>
             </div>
-            <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-4">
+            <dl className="mt-5 hidden grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid sm:grid-cols-4">
               <Stat label="PM2.5 24h" value={reading?.pm25Daily} unit="µg/m³" />
               <Stat label="PM10 24h" value={reading?.pm10Daily} unit="µg/m³" />
               <Stat label="O₃ 8h max" value={reading?.o3} unit="µg/m³" />
