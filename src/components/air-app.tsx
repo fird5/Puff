@@ -15,6 +15,7 @@ import {
 import { PuffCharacter } from "@/components/puff-character";
 import { PuffQuiz } from "@/components/puff-quiz";
 import { HomeBoard } from "@/components/home-board";
+import { SkyScene } from "@/components/sky-scene";
 import {
   BAND_COPY,
   BAND_UTILS,
@@ -186,7 +187,7 @@ export function AirApp({ initial }: Props) {
   }
 
   return (
-    <div className={cn("puff-scene min-h-dvh", `band-${band}`)}>
+    <SkyScene band={band}>
       <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 pb-16 pt-6 sm:px-6 sm:pt-10" inert={quizOpen ? true : undefined}>
         <header className="flex items-start justify-between gap-4">
           <div>
@@ -368,7 +369,7 @@ export function AirApp({ initial }: Props) {
           }}
         />
       ) : null}
-    </div>
+    </SkyScene>
   );
 }
 
