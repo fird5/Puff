@@ -5,7 +5,6 @@ import {
   Crosshair,
   Home,
   LoaderCircle,
-  MapPin,
   RefreshCw,
   Share2,
   Shield,
@@ -20,7 +19,6 @@ import {
   BAND_COPY,
   BAND_UTILS,
   REGIONS,
-  REGION_HINT,
   REGION_LABEL,
   bandForPsi,
   defaultWeatherForRegion,
@@ -155,7 +153,6 @@ export function AirApp({ initial }: Props) {
     const text = "While you're here checking the haze, try a trivia and earn some praise.";
     const payload = { title, text, url };
     const line = `${text}\n${url}`;
-
     try {
       if (typeof navigator.share === "function") {
         const allowed = typeof navigator.canShare !== "function" || navigator.canShare(payload);
@@ -167,7 +164,6 @@ export function AirApp({ initial }: Props) {
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") return;
     }
-
     const copiedLink = await copyText(line);
     if (copiedLink) {
       setShared(true);
@@ -191,10 +187,7 @@ export function AirApp({ initial }: Props) {
 
   return (
     <div className={cn("puff-scene min-h-dvh", `band-${band}`)}>
-      <main
-        className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 pb-16 pt-6 sm:px-6 sm:pt-10"
-        inert={quizOpen ? true : undefined}
-      >
+      <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 pb-16 pt-6 sm:px-6 sm:pt-10" inert={quizOpen ? true : undefined}>
         <header className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-medium tracking-[0.18em] text-fg-subtle uppercase">Singapore air</p>
@@ -280,38 +273,33 @@ export function AirApp({ initial }: Props) {
               <Stat label="NO₂ 1h max" value={reading?.no2} unit="µg/m³" />
             </dl>
           </section>
-          <HomeBoard myName={quizSave.name} refreshKey={boardTick} onPlay={() => setQuizOpen(true)} />
-        </div>
-
-        <section className="flex flex-col gap-3">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-sm font-medium text-fg">Your region</h2>
-            <button type="button" onClick={useLocation} className="inline-flex h-11 items-center gap-2 rounded-xl border border-border bg-bg-elevated px-3 text-sm font-medium text-fg transition-transform duration-150 ease-out active:scale-[0.96]">
-              {loc.status === "asking" ? <LoaderCircle className="size-4 animate-spin" /> : <Crosshair className="size-4" />}
-              Use my location
-            </button>
-          </div>
-          {loc.status === "denied" ? <p className="text-sm text-fg-muted">Location blocked here. Pick a region instead.</p> : null}
-          {loc.status === "away" ? <p className="text-sm text-fg-muted">That pin is outside Singapore. Pick the region you care about.</p> : null}
-          {loc.status === "ok" ? (
-            <p className="inline-flex items-center gap-1.5 text-sm text-fg-muted">
-              <MapPin className="size-3.5" /> Mapped to {REGION_LABEL[region]} from your coordinates.
-            </p>
-          ) : null}
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
-            {REGIONS.map((id) => {
-              const value = data?.regions[id].psi24;
-              const active = id === region;
-              return (
-                <button key={id} type="button" onClick={() => setRegion(id)} className={cn("min-h-14 rounded-xl border px-3 py-2 text-left transition-transform duration-150 ease-out active:scale-[0.96]", active ? "border-fg bg-fg text-bg" : "border-border bg-bg-elevated text-fg")}>
-                  <span className="block text-sm font-medium">{REGION_LABEL[id]}</span>
-                  <span className={cn("text-xs tabular-nums", active ? "text-bg/70" : "text-fg-subtle")}>{value ?? "—"}</span>
+          <div className="flex flex-col gap-3">
+            <div className="rounded-2xl border border-border bg-bg-elevated px-3 py-2.5">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[11px] font-medium uppercase tracking-wide text-fg-subtle">Region</p>
+                <button type="button" onClick={useLocation} className="inline-flex h-7 items-center gap-1 rounded-lg px-2 text-[11px] font-medium text-fg-muted">
+                  {loc.status === "asking" ? <LoaderCircle className="size-3 animate-spin" /> : <Crosshair className="size-3" />}
+                  Near me
                 </button>
-              );
-            })}
+              </div>
+              <div className="mt-2 flex gap-1 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {REGIONS.map((id) => {
+                  const value = data?.regions[id].psi24;
+                  const active = id === region;
+                  return (
+                    <button key={id} type="button" onClick={() => setRegion(id)} className={cn("inline-flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] leading-none transition-transform duration-150 ease-out active:scale-[0.96]", active ? "border-fg bg-fg text-bg" : "border-border bg-bg text-fg")}>
+                      <span className="font-medium">{REGION_LABEL[id]}</span>
+                      <span className={cn("tabular-nums", active ? "text-bg/70" : "text-fg-subtle")}>{value ?? "—"}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              {loc.status === "denied" ? <p className="mt-1.5 text-[11px] text-fg-muted">Location blocked. Tap a region.</p> : null}
+              {loc.status === "away" ? <p className="mt-1.5 text-[11px] text-fg-muted">Outside SG — pick a region.</p> : null}
+            </div>
+            <HomeBoard myName={quizSave.name} refreshKey={boardTick} onPlay={() => setQuizOpen(true)} />
           </div>
-          <p className="text-xs text-fg-subtle">{REGION_HINT[region]}</p>
-        </section>
+        </div>
 
         <section className="grid gap-3 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="rounded-2xl border border-border bg-bg-elevated p-5">
