@@ -39,6 +39,7 @@
     color: var(--color-fg);
     font-family: var(--font-sans);
     min-height: 100%;
+    transition: background-color 700ms ease, color 700ms ease;
   }
 }
 
@@ -68,10 +69,62 @@
   --scene: #e6dce0;
 }
 
+.sky-dawn {
+  --color-bg: #f4e4d8;
+  --color-bg-elevated: #fff6ee;
+  --color-bg-subtle: #edd4c4;
+  --scene: #f7c9b4;
+}
+.sky-day {
+  --scene: var(--scene, #f3eee4);
+}
+.sky-golden {
+  --color-bg: #f3e2c4;
+  --color-bg-elevated: #fff4dd;
+  --color-bg-subtle: #e8d0a4;
+  --scene: #f0c36a;
+}
+.sky-sunset {
+  --color-bg: #f0c9a8;
+  --color-bg-elevated: #ffe3cc;
+  --color-bg-subtle: #e3b08a;
+  --color-accent: #9a4330;
+  --scene: #e8894a;
+}
+.sky-dusk {
+  --color-bg: #2b2438;
+  --color-bg-elevated: #3a3148;
+  --color-bg-subtle: #4a4058;
+  --color-fg: #f4ece4;
+  --color-fg-muted: #c8bdb4;
+  --color-fg-subtle: #9a9088;
+  --color-accent: #e8894a;
+  --color-accent-fg: #2b2438;
+  --scene: #5a3a62;
+}
+.sky-night {
+  --color-bg: #12151c;
+  --color-bg-elevated: #1c212b;
+  --color-bg-subtle: #2a3140;
+  --color-fg: #ece7df;
+  --color-fg-muted: #b7b1a8;
+  --color-fg-subtle: #8b8680;
+  --color-accent: #6aa39c;
+  --color-accent-fg: #12151c;
+  --scene: #1a2230;
+}
+
 .puff-scene {
   background:
     radial-gradient(120% 80% at 50% -10%, color-mix(in oklab, var(--scene) 80%, white) 0%, transparent 55%),
     linear-gradient(180deg, var(--scene) 0%, var(--color-bg) 72%);
+  transition: background 700ms ease;
+}
+.sky-night.puff-scene,
+.sky-dusk.puff-scene {
+  background:
+    radial-gradient(90% 60% at 50% -5%, color-mix(in oklab, var(--scene) 70%, white) 0%, transparent 50%),
+    linear-gradient(180deg, var(--scene) 0%, var(--color-bg) 78%);
 }
 
 .puff-float {
@@ -131,179 +184,76 @@
 
 @keyframes puff-float {
   0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+  100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 @keyframes puff-wobble {
   0%,
-  100% {
-    transform: translateY(2px) rotate(-2deg);
-  }
-  50% {
-    transform: translateY(-4px) rotate(3deg);
-  }
+  100% { transform: translateY(2px) rotate(-2deg); }
+  50% { transform: translateY(-4px) rotate(3deg); }
 }
 @keyframes puff-slump {
   0%,
-  100% {
-    transform: translateY(8px) scale(0.98);
-  }
-  50% {
-    transform: translateY(12px) scale(0.96);
-  }
+  100% { transform: translateY(8px) scale(0.98); }
+  50% { transform: translateY(12px) scale(0.96); }
 }
 @keyframes puff-hide {
   0%,
-  100% {
-    transform: translateY(14px) scale(0.92);
-  }
-  50% {
-    transform: translateY(18px) scale(0.9);
-  }
+  100% { transform: translateY(14px) scale(0.92); }
+  50% { transform: translateY(18px) scale(0.9); }
 }
 @keyframes puff-blink {
-  0%,
-  92%,
-  100% {
-    transform: scaleY(1);
-  }
-  94%,
-  96% {
-    transform: scaleY(0.08);
-  }
+  0%, 92%, 100% { transform: scaleY(1); }
+  94%, 96% { transform: scaleY(0.08); }
 }
 @keyframes puff-cheeks {
-  0%,
-  100% {
-    opacity: 0.55;
-  }
-  50% {
-    opacity: 0.9;
-  }
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 0.9; }
 }
 @keyframes puff-mask-bob {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(2px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(2px); }
 }
 @keyframes puff-spark {
-  0%,
-  100% {
-    opacity: 0.15;
-    transform: scale(0.9);
-  }
-  50% {
-    opacity: 0.7;
-    transform: scale(1);
-  }
+  0%, 100% { opacity: 0.15; transform: scale(0.9); }
+  50% { opacity: 0.7; transform: scale(1); }
 }
 @keyframes puff-glance {
-  0%,
-  18%,
-  100% {
-    transform: translateX(0);
-  }
-  28%,
-  42% {
-    transform: translateX(-3px);
-  }
-  52%,
-  68% {
-    transform: translateX(3px);
-  }
+  0%, 18%, 100% { transform: translateX(0); }
+  28%, 42% { transform: translateX(-3px); }
+  52%, 68% { transform: translateX(3px); }
 }
 @keyframes puff-arm-l {
-  0%,
-  100% {
-    transform: rotate(8deg);
-  }
-  50% {
-    transform: rotate(-10deg);
-  }
+  0%, 100% { transform: rotate(8deg); }
+  50% { transform: rotate(-10deg); }
 }
 @keyframes puff-arm-r {
-  0%,
-  100% {
-    transform: rotate(-8deg);
-  }
-  50% {
-    transform: rotate(12deg);
-  }
+  0%, 100% { transform: rotate(-8deg); }
+  50% { transform: rotate(12deg); }
 }
 @keyframes puff-wave {
-  0%,
-  100% {
-    transform: rotate(-8deg);
-  }
-  25% {
-    transform: rotate(38deg);
-  }
-  50% {
-    transform: rotate(-4deg);
-  }
-  75% {
-    transform: rotate(42deg);
-  }
+  0%, 100% { transform: rotate(-8deg); }
+  25% { transform: rotate(38deg); }
+  50% { transform: rotate(-4deg); }
+  75% { transform: rotate(42deg); }
 }
 @keyframes puff-sneeze {
-  0%,
-  72%,
-  100% {
-    opacity: 0;
-    transform: translate(0, 0) scale(0.4);
-  }
-  80% {
-    opacity: 0.7;
-    transform: translate(10px, -8px) scale(0.85);
-  }
-  92% {
-    opacity: 0;
-    transform: translate(22px, -16px) scale(1.1);
-  }
+  0%, 72%, 100% { opacity: 0; transform: translate(0, 0) scale(0.4); }
+  80% { opacity: 0.7; transform: translate(10px, -8px) scale(0.85); }
+  92% { opacity: 0; transform: translate(22px, -16px) scale(1.1); }
 }
 @keyframes puff-sweat {
-  0%,
-  100% {
-    opacity: 0.15;
-    transform: translateY(0);
-  }
-  50% {
-    opacity: 0.85;
-    transform: translateY(6px);
-  }
+  0%, 100% { opacity: 0.15; transform: translateY(0); }
+  50% { opacity: 0.85; transform: translateY(6px); }
 }
 @keyframes puff-hop {
-  0%,
-  70%,
-  100% {
-    transform: translateY(0);
-  }
-  78% {
-    transform: translateY(-16px);
-  }
-  86% {
-    transform: translateY(-2px);
-  }
-  92% {
-    transform: translateY(-8px);
-  }
+  0%, 70%, 100% { transform: translateY(0); }
+  78% { transform: translateY(-16px); }
+  86% { transform: translateY(-2px); }
+  92% { transform: translateY(-8px); }
 }
 @keyframes puff-pop {
-  0% {
-    transform: scale(1);
-  }
-  40% {
-    transform: scale(1.12);
-  }
-  100% {
-    transform: scale(1);
-  }
+  0% { transform: scale(1); }
+  40% { transform: scale(1.12); }
+  100% { transform: scale(1); }
 }
