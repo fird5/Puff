@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { PuffCharacter } from "@/components/puff-character";
 import { PuffQuiz } from "@/components/puff-quiz";
+import { HomeBoard } from "@/components/home-board";
 import {
   BAND_COPY,
   BAND_UTILS,
@@ -66,6 +67,7 @@ export function AirApp({ initial }: Props) {
   const [quizOpen, setQuizOpen] = useState(false);
   const [quizSave, setQuizSave] = useState<QuizSave>(emptyQuizSave);
   const [popping, setPopping] = useState(false);
+  const [boardTick, setBoardTick] = useState(0);
 
   useEffect(() => {
     const saved = window.localStorage.getItem(STORAGE_KEY);
@@ -190,7 +192,7 @@ export function AirApp({ initial }: Props) {
   return (
     <div className={cn("puff-scene min-h-dvh", `band-${band}`)}>
       <main
-        className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 pb-16 pt-6 sm:px-6 sm:pt-10"
+        className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 pb-16 pt-6 sm:px-6 sm:pt-10"
         inert={quizOpen ? true : undefined}
       >
         <header className="flex items-start justify-between gap-4">
@@ -249,7 +251,7 @@ export function AirApp({ initial }: Props) {
                 try a trivia and earn some praise.
               </p>
               <p className="mt-1.5 text-sm leading-relaxed text-fg-muted">
-                Singapore and the neighbourhood. Five to eight questions, then the leaderboard.
+                New trivia drops while you check haze levels. Play to get on the board or hold your lead.
               </p>
               <button
                 type="button"
@@ -263,67 +265,71 @@ export function AirApp({ initial }: Props) {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-border bg-bg-elevated p-5 sm:p-6">
-          {error ? <p className="text-sm text-unhealthy">{error} Try refresh.</p> : null}
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="text-xs font-medium tracking-wide text-fg-subtle uppercase">
-                24-hour PSI · {REGION_LABEL[region]}
-              </p>
-              <div className="mt-1 flex items-baseline gap-3">
-                <span className="font-display text-6xl leading-none tabular-nums tracking-tight text-fg sm:text-7xl">
-                  {loading && !data ? "—" : psi}
-                </span>
-                <span
-                  className={cn(
-                    "rounded-full px-3 py-1 text-sm font-medium",
-                    band === "good" && "bg-good/12 text-good",
-                    band === "moderate" && "bg-moderate/12 text-moderate",
-                    band === "unhealthy" && "bg-unhealthy/12 text-unhealthy",
-                    band === "very-unhealthy" && "bg-very-unhealthy/12 text-very-unhealthy",
-                    band === "hazardous" && "bg-hazardous/12 text-hazardous",
-                  )}
-                >
-                  {copy.label}
-                </span>
+        <div className="grid items-stretch gap-3 lg:grid-cols-[1.15fr_0.85fr]">
+          <section className="rounded-2xl border border-border bg-bg-elevated p-5 sm:p-6">
+            {error ? <p className="text-sm text-unhealthy">{error} Try refresh.</p> : null}
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <p className="text-xs font-medium tracking-wide text-fg-subtle uppercase">
+                  24-hour PSI · {REGION_LABEL[region]}
+                </p>
+                <div className="mt-1 flex items-baseline gap-3">
+                  <span className="font-display text-6xl leading-none tabular-nums tracking-tight text-fg sm:text-7xl">
+                    {loading && !data ? "—" : psi}
+                  </span>
+                  <span
+                    className={cn(
+                      "rounded-full px-3 py-1 text-sm font-medium",
+                      band === "good" && "bg-good/12 text-good",
+                      band === "moderate" && "bg-moderate/12 text-moderate",
+                      band === "unhealthy" && "bg-unhealthy/12 text-unhealthy",
+                      band === "very-unhealthy" && "bg-very-unhealthy/12 text-very-unhealthy",
+                      band === "hazardous" && "bg-hazardous/12 text-hazardous",
+                    )}
+                  >
+                    {copy.label}
+                  </span>
+                </div>
+              </div>
+              <div className="text-sm text-fg-muted">
+                <p>
+                  1-hr PM2.5{" "}
+                  <span className="font-medium text-fg tabular-nums">{reading?.pm25Hourly ?? "—"}</span> µg/m³
+                </p>
+                {data ? <p className="mt-1 text-fg-subtle">Updated {formatSgt(data.updatedAt)}</p> : null}
               </div>
             </div>
-            <div className="text-sm text-fg-muted">
-              <p>
-                1-hr PM2.5{" "}
-                <span className="font-medium text-fg tabular-nums">{reading?.pm25Hourly ?? "—"}</span> µg/m³
-              </p>
-              {data ? <p className="mt-1 text-fg-subtle">Updated {formatSgt(data.updatedAt)}</p> : null}
+            <p className="mt-4 max-w-prose text-sm leading-relaxed text-fg-muted">{copy.advice}</p>
+            <div className="mt-5">
+              <div className="relative h-2 overflow-hidden rounded-full bg-bg-subtle">
+                <div className="absolute inset-y-0 left-0 w-1/5 bg-good/70" />
+                <div className="absolute inset-y-0 left-1/5 w-1/5 bg-moderate/70" />
+                <div className="absolute inset-y-0 left-2/5 w-1/5 bg-unhealthy/70" />
+                <div className="absolute inset-y-0 left-3/5 w-1/5 bg-very-unhealthy/70" />
+                <div className="absolute inset-y-0 left-4/5 w-1/5 bg-hazardous/70" />
+                <div
+                  className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-bg-elevated bg-fg"
+                  style={{ left: `${psiScalePercent(psi)}%` }}
+                />
+              </div>
+              <div className="mt-1.5 flex justify-between text-xs text-fg-subtle">
+                <span>0</span>
+                <span>50</span>
+                <span>100</span>
+                <span>200</span>
+                <span>300+</span>
+              </div>
             </div>
-          </div>
-          <p className="mt-4 max-w-prose text-sm leading-relaxed text-fg-muted">{copy.advice}</p>
-          <div className="mt-5">
-            <div className="relative h-2 overflow-hidden rounded-full bg-bg-subtle">
-              <div className="absolute inset-y-0 left-0 w-1/5 bg-good/70" />
-              <div className="absolute inset-y-0 left-1/5 w-1/5 bg-moderate/70" />
-              <div className="absolute inset-y-0 left-2/5 w-1/5 bg-unhealthy/70" />
-              <div className="absolute inset-y-0 left-3/5 w-1/5 bg-very-unhealthy/70" />
-              <div className="absolute inset-y-0 left-4/5 w-1/5 bg-hazardous/70" />
-              <div
-                className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-bg-elevated bg-fg"
-                style={{ left: `${psiScalePercent(psi)}%` }}
-              />
-            </div>
-            <div className="mt-1.5 flex justify-between text-xs text-fg-subtle">
-              <span>0</span>
-              <span>50</span>
-              <span>100</span>
-              <span>200</span>
-              <span>300+</span>
-            </div>
-          </div>
-          <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-4">
-            <Stat label="PM2.5 24h" value={reading?.pm25Daily} unit="µg/m³" />
-            <Stat label="PM10 24h" value={reading?.pm10Daily} unit="µg/m³" />
-            <Stat label="O₃ 8h max" value={reading?.o3} unit="µg/m³" />
-            <Stat label="NO₂ 1h max" value={reading?.no2} unit="µg/m³" />
-          </dl>
-        </section>
+            <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-4">
+              <Stat label="PM2.5 24h" value={reading?.pm25Daily} unit="µg/m³" />
+              <Stat label="PM10 24h" value={reading?.pm10Daily} unit="µg/m³" />
+              <Stat label="O₃ 8h max" value={reading?.o3} unit="µg/m³" />
+              <Stat label="NO₂ 1h max" value={reading?.no2} unit="µg/m³" />
+            </dl>
+          </section>
+
+          <HomeBoard myName={quizSave.name} refreshKey={boardTick} onPlay={() => setQuizOpen(true)} />
+        </div>
 
         <section className="flex flex-col gap-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -439,7 +445,10 @@ export function AirApp({ initial }: Props) {
         <PuffQuiz
           band={band}
           save={quizSave}
-          onClose={() => setQuizOpen(false)}
+          onClose={() => {
+            setQuizOpen(false);
+            setBoardTick((n) => n + 1);
+          }}
           onFinish={finishQuiz}
           onName={(name) => {
             setQuizSave((prev) => {
